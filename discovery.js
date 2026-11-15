@@ -38,5 +38,14 @@ root?.addEventListener('click',async e=>{
  }catch(err){showToast(err.message||'Could not save',true);}
 });
 window.loadDiscovery=load;
-document.addEventListener('DOMContentLoaded',load);
+async function loadBotStatus(){
+ try{
+  const r=await fetch('./bot_state.json?ts='+Date.now(),{cache:'no-store'});
+  if(!r.ok)return;
+  const state=await r.json(),decisions=Object.values(state.decisions||{});
+  const el=document.getElementById('telegramDecisionStatus');
+  if(el)el.textContent='Telegram approvals recorded: '+decisions.filter(x=>x.decision==='YES').length+' YES · '+decisions.filter(x=>x.decision==='NO').length+' NO (public, no application submitted)';
+ }catch(e){}
+}
+document.addEventListener('DOMContentLoaded',()=>{load();loadBotStatus();});
 })();
