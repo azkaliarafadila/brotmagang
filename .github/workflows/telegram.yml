@@ -1,8 +1,5 @@
 name: BROT Telegram agent
 on:
-  push:
-    paths:
-      - 'bot_state.json'
   schedule:
     - cron: '*/10 * * * *'
   workflow_dispatch:
