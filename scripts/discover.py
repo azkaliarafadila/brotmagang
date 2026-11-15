@@ -130,7 +130,7 @@ def linkedin_public():
                 if self.card["title"].strip() and self.card["url"]:self.cards.append(self.card)
                 self.in_card=0;self.field=None
     total=0
-    for keywords,location in [("power plant internship","Indonesia"),("electrical engineering internship","Indonesia"),("power system internship","Indonesia"),("business internship","Indonesia"),("power engineering internship","Netherlands")]:
+    for keywords,location in [("power plant internship","Indonesia"),("electrical engineering internship","Indonesia"),("power system internship","Indonesia"),("protection engineer intern","Indonesia"),("solar renewable energy internship","Indonesia"),("PLN internship","Indonesia"),("Medco Power internship","Indonesia"),("Medco Energi internship","Indonesia"),("Pertamina internship","Indonesia"),("Siemens ABB internship","Indonesia"),("Google Amazon internship","Indonesia"),("business internship","Indonesia"),("power engineering internship","Netherlands")]:
         query=urllib.parse.urlencode({"keywords":keywords,"location":location,"f_TPR":"r2592000","start":0})
         url="https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?"+query
         req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; BROTMagang/3.0; public job listings)","Accept":"text/html"})
@@ -154,7 +154,7 @@ BOARDS={
     "Grab":"grab","Gojek":"gojek","Xendit":"xendit",
     "Schneider Electric":"schneiderelectric","NVIDIA":"nvidia",
     "Vercel":"vercel","Discord":"discord","Duolingo":"duolingo",
-    "Canonical":"canonical","Reddit":"reddit","MongoDB":"mongodb"
+    "Canonical":"canonical","Reddit":"reddit","MongoDB":"mongodb","Google":"google","Amazon":"amazon","AWS":"amazonwebservices","GE Vernova":"gevernova","Hitachi Energy":"hitachienergy","Siemens Energy":"siemensenergy","Fluence":"fluence","Enphase Energy":"enphaseenergy"
 }
 for brand,slug in BOARDS.items():
     try:
@@ -169,7 +169,7 @@ for brand,slug in BOARDS.items():
         # A board may be missing, renamed, or rate limited.
         pass
 # Target-company-first ranking. These names are preferences, not proof of eligibility.
-TARGET_COMPANIES=("goto","gojek","tokopedia","tiktok","bytedance","traveloka","shopee","sea group","grab","xendit","telkom","telkomsel","dana","blibli","tiket.com","bukalapak","ruangguru","halodoc","alodokter","akulaku","kredivo","bibit","stockbit","jago","bank jago","siemens","abb","pln","pertamina","unilever","nestle","nestlé","mckinsey","boston consulting group","bcg","pwc","pricewaterhousecoopers")
+TARGET_COMPANIES=("medco","medco energi","medco power","medcoenergi","pln","pln indonesia power","pln nusantara power","pertamina","pertamina new renewable energy","ge vernova","siemens energy","hitachi energy","schneider electric","schneider","abb","adaro","alamtri","barito renewables","star energy","supreme energy","pge","pertamina geothermal","indika energy","tbs energi","suryagen","xurya","sun energy","sunterra","vpower","reka","amazon","amazon web services","aws","google","google cloud","microsoft","microsoft azure","equnix","equinix","goto","gojek","tokopedia","tiktok","bytedance","traveloka","shopee","sea group","grab","xendit","telkom","telkomsel","dana","blibli","tiket.com","bukalapak","ruangguru","halodoc","alodokter","akulaku","kredivo","bibit","stockbit","jago","bank jago","siemens","abb","pln","pertamina","unilever","nestle","nestlé","mckinsey","boston consulting group","bcg","pwc","pricewaterhousecoopers")
 
 def target_priority(j):
     name=j["company"].lower()
