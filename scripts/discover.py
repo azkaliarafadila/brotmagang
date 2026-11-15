@@ -126,9 +126,14 @@ for brand,slug in BOARDS.items():
     except Exception:
         # A board may be missing, renamed, or rate limited.
         pass
+# Target-company-first ranking. These names are preferences, not proof of eligibility.
+TARGET_COMPANIES=("pln","perusahaan listrik negara","unilever","siemens","abb","pertamina","mckinsey","boston consulting group","bcg","pwc","pricewaterhousecoopers","nestle","nestlé")
+def target_priority(j):
+    name=j["company"].lower()
+    return any(x in name for x in TARGET_COMPANIES)
 unique={j["id"]:j for j in jobs}
 for j in unique.values():j["score"]=score(j)
-ordered=sorted(unique.values(),key=lambda j:(-j["score"],j["company"]))[:120]
+ordered=sorted(unique.values(),key=lambda j:(not target_priority(j),-j["score"],j["company"]))[:120]
 payload=dict(updated_at=NOW.isoformat(),sources=counts,errors=errors,count=len(ordered),
              notice="Automated public-feed leads, NOT verified open applications. Confirm eligibility, duration, location and deadline on employer website. No applications submitted.",
              opportunities=ordered)
