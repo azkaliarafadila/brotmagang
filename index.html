@@ -14,6 +14,7 @@
     <div class="nav-label">WORKSPACE</div>
     <nav class="main-nav" aria-label="Dashboard navigation">
       <button class="nav-item active" data-page="overview"><span class="nav-ico">◫</span> Overview</button>
+      <button class="nav-item" data-page="discovery"><span class="nav-ico">✦</span> AI Job Discovery</button>
       <button class="nav-item" data-page="opportunities"><span class="nav-ico">▦</span> Opportunities <span class="nav-count" id="sideJobCount">0</span></button>
       <button class="nav-item" data-page="approvals"><span class="nav-ico">✓</span> Approval queue <span class="nav-count" id="sideApprovalCount">0</span></button>
       <button class="nav-item" data-page="profile"><span class="nav-ico">♙</span> My profile & CV</button>
@@ -34,7 +35,7 @@
         <div class="heading-kicker">YOUR CAREER, IN MOTION</div>
         <div class="page-heading"><div><h1>Make your next move count<span class="heading-dot">.</span></h1><p>A focused space to find, evaluate, and manage your first internship.</p></div><div class="current-step">STAGE 01 <span>·</span> DISCOVER</div></div>
         <div class="hero">
-          <div class="hero-copy"><div class="hero-eyebrow"><span class="glint">✦</span> SUMMER INTERNSHIP 2027</div><h2>One great opportunity<br/>can change everything.</h2><p>Research the right companies, get every application approved, and keep your journey organized from first lead to offer.</p><button class="hero-btn" data-action="add">Explore opportunities <span>↗</span></button></div>
+          <div class="hero-copy"><div class="hero-eyebrow"><span class="glint">✦</span> SUMMER INTERNSHIP 2027</div><h2>One great opportunity<br/>can change everything.</h2><p>Browse automatically discovered public-feed leads, review their eligibility, and keep every application under your control.</p><button class="hero-btn" data-page="discovery">See discovered internships <span>↗</span></button></div>
           <div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div><div class="spark spark-one">✧</div><div class="spark spark-two">✳</div><div class="hero-glass"><div class="glass-top"><span class="tiny-circle"></span><span class="tiny-circle"></span><span class="tiny-circle"></span></div><div class="glass-label">YOUR PATH FORWARD</div><div class="glass-line"><i></i><span></span></div><div class="glass-line short"><i></i><span></span></div><div class="glass-line"><i></i><span></span></div><div class="glass-foot">NEXT CHAPTER <strong>↗</strong></div></div></div>
         </div>
         <div class="stat-grid">
@@ -50,6 +51,12 @@
         <div class="inspiration"><div><span class="small-stars">✷</span> <strong>Companies worth researching</strong><p>Exploratory targets only — not verified vacancies.</p></div><div class="target-chips"><button data-company="Schneider Electric">Schneider Electric ＋</button><button data-company="Traveloka">Traveloka ＋</button><button data-company="Siemens">Siemens ＋</button><button data-company="GoTo">GoTo ＋</button></div></div>
       </section>
 
+      <section id="page-discovery" class="page">
+        <div class="heading-kicker">AUTOMATED JOB FEEDS · DAILY</div>
+        <div class="page-heading"><div><h1>Internship discovery<span class="heading-dot">.</span></h1><p>Fresh leads from public job feeds, automatically updated by GitHub Actions. You don't have to paste links.</p></div><button class="primary-btn" id="discoveryRefresh">↻ Refresh feed</button></div>
+        <div class="panel" style="padding:20px;margin-bottom:16px"><strong>Important: leads are not verified openings.</strong><p style="color:#78839a;line-height:1.7">Check each employer's page for 2027 availability, undergraduate eligibility, 4–8 week duration, work authorization and deadline. Match scores are keyword heuristics, not acceptance probabilities. No automatic applications are sent.</p><div class="toolbar-panel" style="padding:0;margin:14px 0 0"><input type="search" id="discoverySearch" placeholder="Filter company, position, location..." aria-label="Search discovered internships"/></div><p id="discoveryMeta" style="color:#78839a"></p><p id="discoveryWarning" style="color:#b1742d"></p></div>
+        <div id="discoveryRoot" class="discovery-grid"></div>
+      </section>
       <section id="page-opportunities" class="page">
         <div class="heading-kicker">YOUR SHORTLIST</div><div class="page-heading"><div><h1>Opportunity pipeline<span class="heading-dot">.</span></h1><p>Verified openings, upcoming programs, and companies worth contacting.</p></div><button class="primary-btn" data-action="add">＋ Add opportunity</button></div>
         <div class="panel toolbar-panel"><input type="search" id="jobSearch" placeholder="Search company, role, location..." aria-label="Search opportunities"/><select id="stageFilter" aria-label="Filter by stage"><option value="ALL">All stages</option><option value="SAVED">Saved</option><option value="AWAITING_APPROVAL">Awaiting approval</option><option value="APPROVED">Approved</option><option value="APPLIED">Applied</option><option value="DECLINED">Declined</option></select></div>
@@ -83,5 +90,6 @@
 <div class="lock-screen" id="lockScreen" hidden><div class="lock-card"><div class="brand-icon">I<span>·</span>C</div><h2>Unlock your workspace</h2><p>Enter the access code configured on your server.</p><form id="unlockForm"><input id="accessCode" type="password" placeholder="Workspace access code" required/><button class="primary-btn" type="submit">Unlock</button></form></div></div>
 <script src="./static-adapter.js"></script>
 <script src="./app.js"></script>
+<script src="./discovery.js"></script>
 </body>
 </html>
