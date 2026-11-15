@@ -14,7 +14,7 @@ OUT=ROOT/"opportunities.json"
 NOW=dt.datetime.now(dt.timezone.utc)
 HEADERS={"User-Agent":"BrotMagang/2.0 (personal job discovery; GitHub Actions)","Accept":"application/json"}
 PATTERN=re.compile(r"intern(ship)?|trainee|industrial attachment|summer analyst|working student|student assistant|graduate internship",re.I)
-FIELDS=re.compile(r"engineering|electrical|energy|renewable|power|sustainab|business|operations|product|strategy|analyst|data|commercial|supply chain|project|software|consult|technology|procurement|research",re.I)
+FIELDS=re.compile(r"pembangkit|pltu|pltgu|substation|protection|sld|engineering|electrical|energy|renewable|power|sustainab|business|operations|product|strategy|analyst|data|commercial|supply chain|project|software|consult|technology|procurement|research",re.I)
 BLOCK=re.compile(r"senior|staff engineer|principal|director|head of|lead engineer|manager,|[5-9]\+ years",re.I)
 REGION=re.compile(r"indonesia|jakarta|bogor|depok|tangerang|bekasi|remote|worldwide|anywhere|global|singapore|malaysia|taiwan|japan",re.I)
 def get(url):
@@ -23,6 +23,27 @@ def get(url):
         return json.load(r)
 def clean(v):
     return re.sub(r"\s+"," ",unescape(re.sub(r"<[^>]*>"," ",str(v or "")))).strip()
+POWER=re.compile(r"power plant|power generation|pembangkit|pltu|pltg|pltgu|plta|pltp|plts|power system|electrical protection|protection relay|relay coordination|single.line diagram|\\bsld\\b|switchgear|substation|gardu induk|load flow|short.circuit|electrical design|transmission|distribution network|grid engineering|electrical maintenance",re.I)
+ENERGY=re.compile(r"energy|electrical|renewable|utility|power|solar|wind|geothermal|hydro|turbine|generator|transformer",re.I)
+BUSINESS=re.compile(r"business|strategy|operations|commercial|finance|consult|analyst|product|project development",re.I)
+QUAL=re.compile(r"undergraduate|bachelor|b\\.?sc|degree|university student|currently enrolled|active student|final.year|semester|major|electrical engineering|power engineering|gpa|ipk|proficien|experience|knowledge of|familiar with|protection|single.line diagram|\\bsld\\b|autocad|etap|dig\\s*s ilent|powerfactory|excel|english|communication|must have|required|qualification|eligib|work authorization|citizen|visa|graduate|graduation|available|duration|months|weeks",re.I)
+def categorize(j):
+    t=j["title"]+" "+j["description"][:1800]
+    if POWER.search(t):return "Power Systems / Generation"
+    if ENERGY.search(t):return "Energy / Electrical"
+    if BUSINESS.search(t):return "Business / Strategy"
+    return "Other Engineering / Tech"
+def qualification_summary(description):
+    # Extract source-text sentences; never invent a qualification or infer eligibility.
+    if not description:return []
+    sentences=re.split(r"(?<=[.!?])\\s+|\\s*[•\\n]\\s*",description)
+    selected=[]
+    for item in sentences:
+        item=item.strip(" -•")
+        if 15<=len(item)<=260 and QUAL.search(item) and item not in selected:
+            selected.append(item)
+        if len(selected)>=5:break
+    return selected
 def score(j):
     s=30
     t=(j["title"]+" "+j["description"][:900]).lower()
@@ -33,6 +54,9 @@ def score(j):
     if "remote" in loc or "worldwide" in loc:s+=8
     if re.search(r"4.?8 weeks|1.?2 months|summer 2027|2027 summer",t):s+=8
     if re.search(r"undergraduate|currently enrolled|university student|final.year student|active student",t):s+=5
+    if POWER.search(j["title"]):s+=45
+    elif POWER.search(t):s+=25
+    elif ENERGY.search(j["title"]):s+=18
     return min(s,100)
 def normalize(source,company,title,url,location,description,posted):
     title=clean(title);company=clean(company);location=clean(location);description=clean(description)
@@ -45,7 +69,7 @@ def normalize(source,company,title,url,location,description,posted):
     # Eligibility is assessed separately; the listing remains an unverified lead.
     key=hashlib.sha256((company.lower()+"|"+title.lower()+"|"+url).encode()).hexdigest()[:16]
     return dict(id=key,company=company,title=title,url=url,location=location or "Not stated",
-                source=source,posted_at=str(posted or "")[:30],description=description[:850],
+                source=source,posted_at=str(posted or "")[:30],description=description[:4000],
                 score=0,status="SOURCE_LISTED_UNVERIFIED",duration="Not verified",eligibility="Not verified")
 jobs=[];errors=[];counts={}
 try:
@@ -89,7 +113,7 @@ def linkedin_public():
                 if self.card["title"].strip() and self.card["url"]:self.cards.append(self.card)
                 self.in_card=0;self.field=None
     total=0
-    for keywords,location in [("internship engineering","Indonesia"),("business internship","Indonesia"),("energy internship","Indonesia"),("summer 2027 internship","Singapore")]:
+    for keywords,location in [("power plant internship","Indonesia"),("electrical engineering internship","Indonesia"),("power system internship","Indonesia"),("business internship","Indonesia"),("summer 2027 internship","Singapore")]:
         query=urllib.parse.urlencode({"keywords":keywords,"location":location,"f_TPR":"r2592000","start":0})
         url="https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?"+query
         req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; BROTMagang/3.0; public job listings)","Accept":"text/html"})
@@ -134,8 +158,12 @@ def target_priority(j):
     name=j["company"].lower()
     return any(x in name for x in TARGET_COMPANIES)
 unique={j["id"]:j for j in jobs}
-for j in unique.values():j["score"]=score(j)
-ordered=sorted(unique.values(),key=lambda j:(not target_priority(j),-j["score"],j["company"]))[:120]
+for j in unique.values():
+    j["score"]=score(j)
+    j["category"]=categorize(j)
+    j["qualification_summary"]=qualification_summary(j["description"])
+    j["qualification_status"]="Source excerpts only — eligibility unverified" if j["qualification_summary"] else "Qualifications not available in feed — check source"
+ordered=sorted(unique.values(),key=lambda j:(0 if j["category"]=="Power Systems / Generation" else 1 if j["category"]=="Energy / Electrical" else 2,not target_priority(j),-j["score"],j["company"]))[:120]
 payload=dict(updated_at=NOW.isoformat(),sources=counts,errors=errors,count=len(ordered),
              notice="Automated public-feed leads, NOT verified open applications. Confirm eligibility, duration, location and deadline on employer website. No applications submitted.",
              opportunities=ordered)
