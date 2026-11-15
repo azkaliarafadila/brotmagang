@@ -1,5 +1,8 @@
 name: Daily internship discovery
 on:
+  push:
+    paths:
+      - 'opportunities.json'
   schedule:
     - cron: '20 1 * * *'
   workflow_dispatch:
