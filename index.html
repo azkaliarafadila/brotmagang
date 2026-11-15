@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#10192c" />
+  <title>Internship Command Center</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-icon">I<span>·</span>C</div><div><strong>INTERN<span>HUB</span></strong><small>Command Center</small></div></div>
+    <div class="nav-label">WORKSPACE</div>
+    <nav class="main-nav" aria-label="Dashboard navigation">
+      <button class="nav-item active" data-page="overview"><span class="nav-ico">◫</span> Overview</button>
+      <button class="nav-item" data-page="opportunities"><span class="nav-ico">▦</span> Opportunities <span class="nav-count" id="sideJobCount">0</span></button>
+      <button class="nav-item" data-page="approvals"><span class="nav-ico">✓</span> Approval queue <span class="nav-count" id="sideApprovalCount">0</span></button>
+      <button class="nav-item" data-page="profile"><span class="nav-ico">♙</span> My profile & CV</button>
+      <button class="nav-item" data-page="activity"><span class="nav-ico">◷</span> Activity log</button>
+    </nav>
+    <div class="nav-label nav-label-lower">YOUR TARGET</div>
+    <div class="target-box"><span class="target-emoji">✦</span><strong>Summer 2027</strong><p>4–8 week placement<br/>Jabodetabek · Global · Remote</p><div class="target-pill">SKS preferred</div></div>
+    <div class="sidebar-bottom"><div class="bottom-avatar">ITB</div><div><strong>Undergraduate</strong><small>Electrical Engineering</small></div><span class="bottom-dot"></span></div>
+  </aside>
+
+  <div class="content-layout">
+    <header class="topbar">
+      <div class="breadcrumb">Workspace <span>/</span> <b id="breadcrumbPage">Overview</b></div>
+      <div class="top-actions"><div class="local-badge"><span></span> Browser-only · no cloud sync</div><button class="icon-button" id="exportBtn" title="Export your database">⇩</button><button class="top-new" id="topAddBtn"><span>＋</span> Add opportunity</button></div>
+    </header>
+    <main class="main-content">
+      <section id="page-overview" class="page active">
+        <div class="heading-kicker">YOUR CAREER, IN MOTION</div>
+        <div class="page-heading"><div><h1>Make your next move count<span class="heading-dot">.</span></h1><p>A focused space to find, evaluate, and manage your first internship.</p></div><div class="current-step">STAGE 01 <span>·</span> DISCOVER</div></div>
+        <div class="hero">
+          <div class="hero-copy"><div class="hero-eyebrow"><span class="glint">✦</span> SUMMER INTERNSHIP 2027</div><h2>One great opportunity<br/>can change everything.</h2><p>Research the right companies, get every application approved, and keep your journey organized from first lead to offer.</p><button class="hero-btn" data-action="add">Explore opportunities <span>↗</span></button></div>
+          <div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div><div class="spark spark-one">✧</div><div class="spark spark-two">✳</div><div class="hero-glass"><div class="glass-top"><span class="tiny-circle"></span><span class="tiny-circle"></span><span class="tiny-circle"></span></div><div class="glass-label">YOUR PATH FORWARD</div><div class="glass-line"><i></i><span></span></div><div class="glass-line short"><i></i><span></span></div><div class="glass-line"><i></i><span></span></div><div class="glass-foot">NEXT CHAPTER <strong>↗</strong></div></div></div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat"><div class="stat-head">Saved opportunities <span class="stat-icon pale-blue">▦</span></div><div class="stat-value" id="metricJobs">0</div><small>Companies on your radar</small></div>
+          <div class="stat"><div class="stat-head">Awaiting your YES <span class="stat-icon pale-orange">◷</span></div><div class="stat-value" id="metricPending">0</div><small>Nothing sent without approval</small></div>
+          <div class="stat"><div class="stat-head">Approved to proceed <span class="stat-icon pale-violet">✓</span></div><div class="stat-value" id="metricApproved">0</div><small>Ready for guided application</small></div>
+          <div class="stat"><div class="stat-head">Applications recorded <span class="stat-icon pale-green">↗</span></div><div class="stat-value" id="metricApplied">0</div><small>With submission evidence</small></div>
+        </div>
+        <div class="two-col">
+          <div class="panel recent-panel"><div class="panel-top"><div><h3>Opportunity pipeline</h3><p>Your most recent leads and next actions</p></div><button class="text-button" data-page="opportunities">View all ↗</button></div><div id="overviewJobs" class="recent-list"></div></div>
+          <div class="panel quick-panel"><div class="panel-top"><div><h3>Your launch checklist</h3><p>Build the foundation before you apply</p></div></div><div class="checklist" id="checklist"></div><div class="note-box"><span>✳</span><div><strong>Approval is not submission.</strong><p>This version prepares application data, but an external browser agent isn't connected yet.</p></div></div></div>
+        </div>
+        <div class="inspiration"><div><span class="small-stars">✷</span> <strong>Companies worth researching</strong><p>Exploratory targets only — not verified vacancies.</p></div><div class="target-chips"><button data-company="Schneider Electric">Schneider Electric ＋</button><button data-company="Traveloka">Traveloka ＋</button><button data-company="Siemens">Siemens ＋</button><button data-company="GoTo">GoTo ＋</button></div></div>
+      </section>
+
+      <section id="page-opportunities" class="page">
+        <div class="heading-kicker">YOUR SHORTLIST</div><div class="page-heading"><div><h1>Opportunity pipeline<span class="heading-dot">.</span></h1><p>Verified openings, upcoming programs, and companies worth contacting.</p></div><button class="primary-btn" data-action="add">＋ Add opportunity</button></div>
+        <div class="panel toolbar-panel"><input type="search" id="jobSearch" placeholder="Search company, role, location..." aria-label="Search opportunities"/><select id="stageFilter" aria-label="Filter by stage"><option value="ALL">All stages</option><option value="SAVED">Saved</option><option value="AWAITING_APPROVAL">Awaiting approval</option><option value="APPROVED">Approved</option><option value="APPLIED">Applied</option><option value="DECLINED">Declined</option></select></div>
+        <div class="panel table-panel"><div class="table-responsive"><table class="jobs-table"><thead><tr><th>COMPANY / ROLE</th><th>VERIFICATION</th><th>LOCATION</th><th>STAGE</th><th>NEXT ACTION</th></tr></thead><tbody id="jobsBody"></tbody></table></div><div id="jobsEmpty" class="empty-state" hidden><div class="empty-icon">◈</div><h3>No opportunities yet</h3><p>Add your first company or paste a verified internship listing.</p><button class="primary-btn" data-action="add">＋ Add your first target</button></div></div>
+        <p class="footnote">Verification labels are entered by you. The dashboard does not currently crawl or verify employers on its own.</p>
+      </section>
+
+      <section id="page-approvals" class="page">
+        <div class="heading-kicker">YOU STAY IN CONTROL</div><div class="page-heading"><div><h1>Approval queue<span class="heading-dot">.</span></h1><p>Every application needs a specific, documented YES before you proceed.</p></div></div>
+        <div class="approval-callout"><div class="approval-mark">✓</div><div><strong>One company. One role. One explicit approval.</strong><p>Approving a role unlocks a reusable application data pack and application link. It does not submit anything to the employer by itself.</p></div></div>
+        <div id="approvalList" class="approval-list"></div>
+      </section>
+
+      <section id="page-profile" class="page">
+        <div class="heading-kicker">APPLICATION IDENTITY</div><div class="page-heading"><div><h1>One profile. Every application<span class="heading-dot">.</span></h1><p>Select your CV locally and complete your profile. For privacy, this version never uploads your CV to a server.</p></div></div>
+        <div class="profile-grid">
+          <div><div class="panel cv-panel"><div class="panel-top"><div><h3>Curriculum Vitae</h3><p>PDF, DOCX or TXT · Max 5 MB</p></div><span class="section-icon">▧</span></div><label class="dropzone" for="cvInput" id="dropzone"><div class="upload-ico">⇧</div><strong>Drop your CV here</strong><span>or click to browse files</span><input id="cvInput" type="file" accept=".pdf,.docx,.txt,application/pdf" hidden/></label><div id="resumeDisplay" class="resume-details"></div><div class="privacy-text">🔒 This GitHub Pages version keeps your profile in this browser. CV metadata stays locally; the file is never uploaded to GitHub or an employer. Re-select your CV when applying.</div></div>
+            <div class="panel readiness-panel"><h3>Application readiness</h3><div id="readiness"></div><div class="quiet-warning">Your skills must be described truthfully. Fill only information that you can personally verify.</div></div></div>
+          <div class="panel form-panel"><div class="panel-top"><div><h3>Candidate information</h3><p>Review all fields before using autofill.</p></div><span class="tiny-chip">EDITABLE</span></div><form id="profileForm"><div class="form-grid" id="profileFields"></div><div class="form-buttons"><button class="primary-btn" type="submit">Save profile ↗</button><span id="saveProfileMsg"></span></div></form></div>
+        </div>
+      </section>
+
+      <section id="page-activity" class="page"><div class="heading-kicker">ACCOUNTABILITY FIRST</div><div class="page-heading"><div><h1>Activity & notifications<span class="heading-dot">.</span></h1><p>A chronological audit trail of reviews, decisions, and recorded submissions.</p></div></div><div class="panel activity-panel"><div class="panel-top"><div><h3>Activity history</h3><p>Nothing is marked “applied” without your submission evidence.</p></div></div><div id="activityList"></div></div><div class="notice-bar"><strong>Email notifications:</strong> <span id="emailAvailability"></span></div></section>
+    </main>
+    <footer class="footer"><span>INTERNHUB · built for your Summer 2027 search</span><span>Private-by-default · No blind applications</span></footer>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-header"><div><span id="modalKicker">WORKFLOW</span><h2 id="modalTitle">Add opportunity</h2></div><button class="modal-close" id="modalClose" aria-label="Close dialog">×</button></div><div class="modal-body" id="modalBody"></div><div class="modal-actions" id="modalActions"></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="lock-screen" id="lockScreen" hidden><div class="lock-card"><div class="brand-icon">I<span>·</span>C</div><h2>Unlock your workspace</h2><p>Enter the access code configured on your server.</p><form id="unlockForm"><input id="accessCode" type="password" placeholder="Workspace access code" required/><button class="primary-btn" type="submit">Unlock</button></form></div></div>
+<script src="./static-adapter.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
