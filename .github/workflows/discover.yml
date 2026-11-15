@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'opportunities.json'
+      - 'scripts/discover.py'
   schedule:
     - cron: '20 1 * * *'
   workflow_dispatch:
