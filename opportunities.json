@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-15T10:52:54.719930+00:00",
+  "updated_at": "2026-11-15T10:53:15.480451+00:00",
   "sources": {
     "Arbeitnow": 300,
     "Remotive": 16,
@@ -21,7 +21,7 @@
   },
   "errors": [],
   "count": 94,
-  "notice": "Fresh discovery re-run requested after fixing GitHub push conflict; LinkedIn public listing support included.",
+  "notice": "Automated public-feed leads, NOT verified open applications. Confirm eligibility, duration, location and deadline on employer website. No applications submitted.",
   "opportunities": [
     {
       "id": "98e93676f83defd0",
