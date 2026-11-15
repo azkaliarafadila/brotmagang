@@ -79,9 +79,8 @@ def normalize(source,company,title,url,location,description,posted):
     if not PATTERN.search(title):return None
     if not FIELDS.search(title+" "+description[:1100]):return None
     if BLOCK.search(title):return None
-    # Remote roles outside Indonesia remain visible, but work authorization is NOT assumed.
-    # Do not discard legitimate international internships just because the location is not on a short allowlist.
-    # Eligibility is assessed separately; the listing remains an unverified lead.
+    location_label,location_rank=location_info(location,description)
+    if location_rank==99:return None
     key=hashlib.sha256((company.lower()+"|"+title.lower()+"|"+url).encode()).hexdigest()[:16]
     return dict(id=key,company=company,title=title,url=url,location=location or "Not stated",
                 source=source,posted_at=str(posted or "")[:30],description=description[:4000],
