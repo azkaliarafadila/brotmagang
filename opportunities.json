@@ -1,8 +1,11 @@
 {
-  "updated_at": null,
-  "sources": {},
+  "updated_at": "2026-11-15T10:38:59.349541+00:00",
+  "sources": {
+    "Arbeitnow": 300,
+    "Remotive": 16
+  },
   "errors": [],
   "count": 0,
-  "notice": "First scheduled scan pending; no applications submitted. Initial scan requested.",
+  "notice": "Automated public-feed leads, NOT verified open applications. Confirm eligibility, duration, location and deadline on employer website. No applications submitted.",
   "opportunities": []
 }
