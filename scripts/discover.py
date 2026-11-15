@@ -17,6 +17,21 @@ PATTERN=re.compile(r"intern(ship)?|trainee|industrial attachment|summer analyst|
 FIELDS=re.compile(r"pembangkit|pltu|pltgu|substation|protection|sld|engineering|electrical|energy|renewable|power|sustainab|business|operations|product|strategy|analyst|data|commercial|supply chain|project|software|consult|technology|procurement|research",re.I)
 BLOCK=re.compile(r"senior|staff engineer|principal|director|head of|lead engineer|manager,|[5-9]\+ years",re.I)
 REGION=re.compile(r"indonesia|jakarta|bogor|depok|tangerang|bekasi|remote|worldwide|anywhere|global|singapore|malaysia|taiwan|japan",re.I)
+JABODETABEK=re.compile(r"jakarta|bogor|depok|tangerang|bekasi|jabodetabek|greater jakarta|jakarta metropolitan",re.I)
+INDONESIA=re.compile(r"indonesia|jakarta|bogor|depok|tangerang|bekasi|bandung|surabaya|semarang|yogyakarta|jogja|medan|makassar|balikpapan|batam|palembang|pekanbaru|denpasar|bali|malang|cilegon|karawang|cikarang|purwakarta|cilacap|gresik|sidoarjo|banjarmasin|pontianak|manado|padang|papua|sulawesi|sumatra|sumatera|kalimantan|jawa|java|nusantara",re.I)
+NETHERLANDS=re.compile(r"netherlands|nederland|belanda|amsterdam|rotterdam|eindhoven|delft|utrecht|the hague|den haag|groningen|enschede|wageningen|leiden|maastricht",re.I)
+REMOTE=re.compile(r"remote|work from anywhere|worldwide|fully distributed|work from home",re.I)
+RESTRICTED_REMOTE=re.compile(r"remote\\s*[-–(]?\\s*(us|usa|united states|uk|united kingdom|eu|europe|emea|canada|australia|singapore|malaysia|india)\\b|\\b(us|usa|uk|eu|emea|canada|australia)\\s*[-–]?\\s*only\\b|must be (based|located) in (the )?(us|united states|uk|eu|europe|canada|australia)",re.I)
+def location_info(location,description):
+    loc=location or ""
+    if JABODETABEK.search(loc):return "Jakarta / Jabodetabek",0
+    if INDONESIA.search(loc):return "Other Indonesia",1
+    if NETHERLANDS.search(loc):return "Netherlands exception",3
+    if REMOTE.search(loc):
+        if RESTRICTED_REMOTE.search(loc+" "+description[:1500]):return "Remote region restricted",99
+        if re.search(r"indonesia|worldwide|anywhere|global|any country",loc+" "+description[:1500],re.I):return "Remote — Indonesia potentially allowed; verify",2
+        return "Remote — Indonesia eligibility unverified",2
+    return "Outside target locations",99
 def get(url):
     req=urllib.request.Request(url,headers=HEADERS)
     with urllib.request.urlopen(req,timeout=22) as r:
@@ -70,7 +85,7 @@ def normalize(source,company,title,url,location,description,posted):
     key=hashlib.sha256((company.lower()+"|"+title.lower()+"|"+url).encode()).hexdigest()[:16]
     return dict(id=key,company=company,title=title,url=url,location=location or "Not stated",
                 source=source,posted_at=str(posted or "")[:30],description=description[:4000],
-                score=0,status="SOURCE_LISTED_UNVERIFIED",duration="Not verified",eligibility="Not verified")
+                score=0,location_category=location_label,location_rank=location_rank,status="SOURCE_LISTED_UNVERIFIED",duration="Not verified",eligibility="Not verified")
 jobs=[];errors=[];counts={}
 try:
     d=get("https://www.arbeitnow.com/api/job-board-api")
@@ -113,7 +128,7 @@ def linkedin_public():
                 if self.card["title"].strip() and self.card["url"]:self.cards.append(self.card)
                 self.in_card=0;self.field=None
     total=0
-    for keywords,location in [("power plant internship","Indonesia"),("electrical engineering internship","Indonesia"),("power system internship","Indonesia"),("business internship","Indonesia"),("summer 2027 internship","Singapore")]:
+    for keywords,location in [("power plant internship","Indonesia"),("electrical engineering internship","Indonesia"),("power system internship","Indonesia"),("business internship","Indonesia"),("power engineering internship","Netherlands")]:
         query=urllib.parse.urlencode({"keywords":keywords,"location":location,"f_TPR":"r2592000","start":0})
         url="https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?"+query
         req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; BROTMagang/3.0; public job listings)","Accept":"text/html"})
@@ -163,7 +178,7 @@ for j in unique.values():
     j["category"]=categorize(j)
     j["qualification_summary"]=qualification_summary(j["description"])
     j["qualification_status"]="Source excerpts only — eligibility unverified" if j["qualification_summary"] else "Qualifications not available in feed — check source"
-ordered=sorted(unique.values(),key=lambda j:(0 if j["category"]=="Power Systems / Generation" else 1 if j["category"]=="Energy / Electrical" else 2,not target_priority(j),-j["score"],j["company"]))[:120]
+ordered=sorted(unique.values(),key=lambda j:(j["location_rank"],0 if j["category"]=="Power Systems / Generation" else 1 if j["category"]=="Energy / Electrical" else 2,not target_priority(j),-j["score"],j["company"]))[:120]
 payload=dict(updated_at=NOW.isoformat(),sources=counts,errors=errors,count=len(ordered),
              notice="Automated public-feed leads, NOT verified open applications. Confirm eligibility, duration, location and deadline on employer website. No applications submitted.",
              opportunities=ordered)
