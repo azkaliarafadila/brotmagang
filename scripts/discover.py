@@ -5,6 +5,7 @@ import hashlib
 import json
 import re
 import urllib.request
+import urllib.parse
 from pathlib import Path
 from html import unescape
 
@@ -39,7 +40,8 @@ def normalize(source,company,title,url,location,description,posted):
     if not FIELDS.search(title+" "+description[:1100]):return None
     if BLOCK.search(title):return None
     # Remote roles outside Indonesia remain visible, but work authorization is NOT assumed.
-    if not REGION.search(location):return None
+    # Do not discard legitimate international internships just because the location is not on a short allowlist.
+    # Eligibility is assessed separately; the listing remains an unverified lead.
     key=hashlib.sha256((company.lower()+"|"+title.lower()+"|"+url).encode()).hexdigest()[:16]
     return dict(id=key,company=company,title=title,url=url,location=location or "Not stated",
                 source=source,posted_at=str(posted or "")[:30],description=description[:850],
@@ -62,6 +64,45 @@ try:
         j=normalize("Remotive",x.get("company_name"),x.get("title"),x.get("url"),x.get("candidate_required_location") or "Remote",x.get("description"),x.get("publication_date"))
         if j:jobs.append(j)
 except Exception as e:errors.append("Remotive: "+type(e).__name__)
+# LinkedIn public guest search, best effort only. No login, private API, CAPTCHA bypass, or credentials.
+# LinkedIn may return 403 or change markup; failure must be visible in the feed.
+def linkedin_public():
+    from html.parser import HTMLParser
+    class Cards(HTMLParser):
+        def __init__(self):
+            super().__init__();self.in_card=0;self.field=None;self.card=None;self.cards=[]
+        def handle_starttag(self,tag,attrs):
+            a=dict(attrs);classes=a.get("class","")
+            if tag=="li" and self.in_card==0:
+                self.in_card=1;self.card={"title":"","company":"","location":"","url":""}
+            elif self.in_card:
+                if tag=="a" and "base-card__full-link" in classes:self.field="url";self.card["url"]=a.get("href","").split("?")[0]
+                elif tag in ("h3","h4","span") and "base-search-card__title" in classes:self.field="title"
+                elif tag in ("h4","a") and "base-search-card__subtitle" in classes:self.field="company"
+                elif "job-search-card__location" in classes:self.field="location"
+        def handle_data(self,data):
+            if self.in_card and self.field in ("title","company","location"):self.card[self.field]+=data.strip()+" "
+        def handle_endtag(self,tag):
+            if self.in_card and tag in ("h3","h4","span","a"):self.field=None
+            if tag=="li" and self.in_card:
+                if self.card["title"].strip() and self.card["url"]:self.cards.append(self.card)
+                self.in_card=0;self.field=None
+    total=0
+    for keywords,location in [("internship engineering","Indonesia"),("business internship","Indonesia"),("energy internship","Indonesia"),("summer 2027 internship","Singapore")]:
+        query=urllib.parse.urlencode({"keywords":keywords,"location":location,"f_TPR":"r2592000","start":0})
+        url="https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?"+query
+        req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; BROTMagang/3.0; public job listings)","Accept":"text/html"})
+        try:
+            with urllib.request.urlopen(req,timeout=18) as resp:html=resp.read(600000).decode("utf-8","replace")
+            parser=Cards();parser.feed(html)
+            for x in parser.cards:
+                j=normalize("LinkedIn public listing",x["company"],x["title"],x["url"],x["location"],"",None)
+                if j:jobs.append(j);total+=1
+        except Exception as exc:
+            errors.append("LinkedIn public listings unavailable ("+type(exc).__name__+"); use direct LinkedIn search link")
+    counts["LinkedIn public listings"]=total
+linkedin_public()
+
 # Public Greenhouse job boards (best-effort; board slugs may change).
 # This expands beyond the two broad job aggregators without login scraping.
 BOARDS={
