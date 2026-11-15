@@ -62,6 +62,29 @@ try:
         j=normalize("Remotive",x.get("company_name"),x.get("title"),x.get("url"),x.get("candidate_required_location") or "Remote",x.get("description"),x.get("publication_date"))
         if j:jobs.append(j)
 except Exception as e:errors.append("Remotive: "+type(e).__name__)
+# Public Greenhouse job boards (best-effort; board slugs may change).
+# This expands beyond the two broad job aggregators without login scraping.
+BOARDS={
+    "Airbnb":"airbnb","Cloudflare":"cloudflare","Datadog":"datadog",
+    "Figma":"figma","GitLab":"gitlab","Notion":"notion",
+    "Stripe":"stripe","Wise":"wise","Canva":"canva",
+    "Grab":"grab","Gojek":"gojek","Xendit":"xendit",
+    "Schneider Electric":"schneiderelectric","NVIDIA":"nvidia",
+    "Vercel":"vercel","Discord":"discord","Duolingo":"duolingo",
+    "Canonical":"canonical","Reddit":"reddit","MongoDB":"mongodb"
+}
+for brand,slug in BOARDS.items():
+    try:
+        d=get("https://boards-api.greenhouse.io/v1/boards/"+slug+"/jobs?content=true")
+        items=d.get("jobs",[])
+        counts["Greenhouse "+brand]=len(items)
+        for x in items:
+            loc=(x.get("location") or {}).get("name","")
+            j=normalize("Greenhouse / "+brand,brand,x.get("title"),x.get("absolute_url"),loc,x.get("content"),x.get("updated_at"))
+            if j:jobs.append(j)
+    except Exception:
+        # A board may be missing, renamed, or rate limited.
+        pass
 unique={j["id"]:j for j in jobs}
 for j in unique.values():j["score"]=score(j)
 ordered=sorted(unique.values(),key=lambda j:(-j["score"],j["company"]))[:120]
