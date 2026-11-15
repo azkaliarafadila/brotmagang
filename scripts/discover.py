@@ -32,6 +32,7 @@ def score(j):
     if "indonesia" in loc or "jakarta" in loc:s+=18
     if "remote" in loc or "worldwide" in loc:s+=8
     if re.search(r"4.?8 weeks|1.?2 months|summer 2027|2027 summer",t):s+=8
+    if re.search(r"undergraduate|currently enrolled|university student|final.year student|active student",t):s+=5
     return min(s,100)
 def normalize(source,company,title,url,location,description,posted):
     title=clean(title);company=clean(company);location=clean(location);description=clean(description)
@@ -127,7 +128,8 @@ for brand,slug in BOARDS.items():
         # A board may be missing, renamed, or rate limited.
         pass
 # Target-company-first ranking. These names are preferences, not proof of eligibility.
-TARGET_COMPANIES=("pln","perusahaan listrik negara","unilever","siemens","abb","pertamina","mckinsey","boston consulting group","bcg","pwc","pricewaterhousecoopers","nestle","nestlé")
+TARGET_COMPANIES=("goto","gojek","tokopedia","tiktok","bytedance","traveloka","shopee","sea group","grab","xendit","telkom","telkomsel","dana","blibli","tiket.com","bukalapak","ruangguru","halodoc","alodokter","akulaku","kredivo","bibit","stockbit","jago","bank jago","siemens","abb","pln","pertamina","unilever","nestle","nestlé","mckinsey","boston consulting group","bcg","pwc","pricewaterhousecoopers")
+
 def target_priority(j):
     name=j["company"].lower()
     return any(x in name for x in TARGET_COMPANIES)
