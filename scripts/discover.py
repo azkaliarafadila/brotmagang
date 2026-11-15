@@ -85,6 +85,9 @@ def normalize(source,company,title,url,location,description,posted):
     return dict(id=key,company=company,title=title,url=url,location=location or "Not stated",
                 source=source,posted_at=str(posted or "")[:30],description=description[:4000],
                 score=0,location_category=location_label,location_rank=location_rank,status="SOURCE_LISTED_UNVERIFIED",duration="Not verified",eligibility="Not verified")
+# Fail fast on regressions instead of publishing a misleading empty feed.
+_probe=normalize("self-test","Example Power","Electrical Engineering Intern","https://example.com/job","Jakarta, Indonesia","Undergraduate electrical engineering student",None)
+assert _probe is not None and _probe["location_rank"]==0, "Discovery normalization self-test failed"
 jobs=[];errors=[];counts={}
 try:
     d=get("https://www.arbeitnow.com/api/job-board-api")
